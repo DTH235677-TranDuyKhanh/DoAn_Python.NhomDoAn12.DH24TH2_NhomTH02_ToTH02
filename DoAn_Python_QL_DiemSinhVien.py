@@ -15,7 +15,7 @@ def connect_db():
 # ===== HÀM CHUYỂN FRAME =====
 def show_frame(name):
     for f in frames.values():
-        f.pack_forget()
+        f.pack_forget()   
     frames[name].pack(fill="both", expand=True)
 
 # ===== HÀM TẢI DỮ LIỆU =====
