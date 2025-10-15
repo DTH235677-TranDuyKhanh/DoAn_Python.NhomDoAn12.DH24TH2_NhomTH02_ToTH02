@@ -72,7 +72,8 @@ def calc_average(tree):
         tree.heading(col, text=col)
         tree.column(col, width=150, anchor="center")
     for row in rows:
-        tree.insert("", "end", values=row)
+        diem_tb = round(row[2], 2) if row[2] is not None else 0  # 🔹 làm tròn 2 chữ số
+        tree.insert("", "end", values=(row[0], row[1], diem_tb, row[3]))
     conn.close()
 
 # ====== TẠO CỬA SỔ CHÍNH ======
