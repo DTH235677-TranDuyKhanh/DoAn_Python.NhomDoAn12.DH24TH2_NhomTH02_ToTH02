@@ -205,8 +205,7 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
 
                 conn = connect_db()
                 cur = conn.cursor()
-                cur.execute("INSERT INTO diem (maSV, maMH, diemQT, diemThi) VALUES (%s, %s, %s, %s)",
-                            (maSV, maMH, diemQT, diemThi))
+                cur.execute("INSERT INTO diem (maSV, maMH, diemQT, diemThi) VALUES (%s, %s, %s, %s)", (maSV, maMH, diemQT, diemThi))
                 conn.commit()
                 conn.close()
                 messagebox.showinfo("Thành công", "Đã thêm điểm!")
@@ -224,8 +223,7 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
                 diemTong = diemQT * 0.4 + diemThi * 0.6
                 conn = connect_db()
                 cur = conn.cursor()
-                cur.execute("UPDATE diem SET diemQT=%s, diemThi=%s WHERE maSV=%s AND maMH=%s",
-                        (diemQT, diemThi, maSV, maMH))
+                cur.execute("UPDATE diem SET diemQT=%s, diemThi=%s WHERE maSV=%s AND maMH=%s",(diemQT, diemThi, maSV, maMH))
                 conn.commit()
                 conn.close()
                 messagebox.showinfo("Thành công", "Đã cập nhật điểm!")
