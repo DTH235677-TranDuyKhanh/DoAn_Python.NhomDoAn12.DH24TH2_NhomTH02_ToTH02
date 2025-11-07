@@ -66,10 +66,17 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
         tk.Label(form, text="Mã số sinh viên:", bg="#fff").grid(row=0, column=0, padx=10, pady=5,sticky="w") #Sử dụng grid để điều chỉnh vị trí label + entry theo hàng/cột.
         maSV_entry = tk.Entry(form, width=20)
         maSV_entry.grid(row=0, column=1, padx=5, pady=5,sticky="w")
-        # Text nã môn học
-        tk.Label(form, text="Mã môn học:", bg="#fff").grid(row=0, column=2, padx=10, pady=5,sticky="w")
-        maMH_entry = tk.Entry(form, width=20)
-        maMH_entry.grid(row=0, column=3, padx=5, pady=5,sticky="w")
+        # Combobox nã môn học
+        tk.Label(form, text="Mã môn học:", bg="#fff").grid(row=0, column=2, padx=10, pady=5, sticky="w")
+        # --- Kết nối CSDL và lấy danh sách mã môn học ---
+        conn = connect_db()
+        cur = conn.cursor()
+        cur.execute("SELECT maMH FROM monhoc")
+        maMH_list = [row[0] for row in cur.fetchall()]
+        conn.close()
+        # --- Tạo Combobox hiển thị mã môn học ---
+        maMH_entry = ttk.Combobox(form, values=maMH_list, width=18, state="readonly")
+        maMH_entry.grid(row=0, column=3, padx=5, pady=5, sticky="w")
         # Text điểm quá trình
         tk.Label(form, text="Điểm quá trình:", bg="#fff").grid(row=1, column=0, padx=10, pady=5,sticky="w")
         diemQT_entry = tk.Entry(form, width=20)
@@ -78,11 +85,49 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
         tk.Label(form, text="Điểm thi:", bg="#fff").grid(row=1, column=2, padx=10, pady=5,sticky="w")
         diemThi_entry = tk.Entry(form, width=20)
         diemThi_entry.grid(row=1, column=3, padx=5, pady=5)
+    # --- HÀM TÌM KIẾM THEO MÃ SINH VIÊN ---
+        def tim_kiem_diem():
+            try:
+                maSV = maSV_entry.get().strip()
+                if not maSV:
+                    messagebox.showwarning("Cảnh báo", "Vui lòng nhập mã sinh viên cần tìm!")
+                    return
 
+                conn = connect_db()
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT d.maSV, mh.maMH, d.diemQT, d.diemThi, d.diemTong
+                    FROM diem d
+                    JOIN monhoc mh ON d.maMH = mh.maMH
+                    WHERE d.maSV = %s
+                """, (maSV,))
+                rows = cur.fetchall()
+                conn.close()
+
+                # Xóa dữ liệu cũ trong TreeView
+                for item in tree_diem.get_children():
+                    tree_diem.delete(item)
+
+                # Cập nhật lại cột
+                columns = ["Mã SV", "Tên Môn Học", "Điểm QT", "Điểm Thi", "Điểm Tổng"]
+                tree_diem["columns"] = columns
+                for col in columns:
+                    tree_diem.heading(col, text=col)
+                    tree_diem.column(col, width=150, anchor="center")
+
+                # Thêm dữ liệu tìm thấy
+                for row in rows:
+                    tree_diem.insert("", "end", values=row)
+
+                if not rows:
+                    messagebox.showinfo("Kết quả", f"Không tìm thấy điểm cho sinh viên có mã: {maSV}")
+
+            except Exception as e:
+                messagebox.showerror("Lỗi", str(e))
         # ====== HÀM RESET ======
         def reset_fields():
             maSV_entry.delete(0, tk.END)
-            maMH_entry.delete(0, tk.END)
+            maMH_entry.set("")  # Xóa chọn combobox (đưa về trống)
             diemQT_entry.delete(0, tk.END)
             diemThi_entry.delete(0, tk.END)
             
@@ -97,9 +142,10 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
         btn_frame2 = tk.Frame(frames[t], bg="#fff")
         btn_frame2.pack(pady=2)
         ttk.Button(btn_frame2, text="Lưu điểm", width=18, command=lambda: luu_excel()).pack(side="left", padx=10, pady=5)
-        ttk.Button(btn_frame2, text="Reset", width=18, command=reset_fields).pack(side="left", padx=10, pady=5)
+        ttk.Button(btn_frame2, text="Reset", width=18, command=reset_fields).pack(side="left", padx=10, pady=5)  
+        ttk.Button(btn_frame2, text="Tìm kiếm", width=18, command=tim_kiem_diem).pack(side="left", padx=10, pady=5)
         ttk.Button(btn_frame2, text="Thoát", width=18, style="Accent.TButton", command=root.destroy).pack(side="left", padx=10 ,pady=5)#Sử dụng grid cho hàng 1, dùng pack(side="left") cho hàng 2 để căn giữa.
-        
+
         # --- BẢNG DỮ LIỆU ---
         tree_diem = ttk.Treeview(frames[t], show="headings") #show="headings" tắt cột mặc định (tree icon) — chỉ hiển thị cột bạn đặt bằng tree["columns"].
         tree_diem.pack(fill="both", expand=True, padx=10, pady=10) #pack(fill="both", expand=True) cho bảng giãn chiếm toàn bộ vùng còn lại.
@@ -111,8 +157,7 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
             if len(values) >= 4:
                 maSV_entry.delete(0, tk.END)
                 maSV_entry.insert(0, values[0])
-                maMH_entry.delete(0, tk.END)
-                maMH_entry.insert(0, values[1])
+                maMH_entry.set(values[1])
                 diemQT_entry.delete(0, tk.END)
                 diemQT_entry.insert(0, values[2])
                 diemThi_entry.delete(0, tk.END)
