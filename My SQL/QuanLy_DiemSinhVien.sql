@@ -1,16 +1,19 @@
 -- tạo database
-CREATE DATABASE ql_diemsinhvien CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE QuanLy_DiemSinhVien CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- sử dụng database vừa tạo 
-use ql_diemsinhvien;
+use QuanLy_DiemSinhVien;
 
 -- tạo bảng 
 -- bảng khoa 
 create table khoa(
 	maKhoa char(10) primary key,
     tenKhoa varchar(100) not null
-);
-
+);  
+INSERT INTO khoa VALUES ('CNTT', 'Công nghệ thông tin'),
+						('KT', 'Kinh tế'),
+                        ('NN','Nông Nghiệp'),
+                        ('SP','Sư Phạm');
 -- bảng lớp 
 create table lop(
 	maLop char(10) primary key,
@@ -18,6 +21,18 @@ create table lop(
     maKhoa char(10),
     foreign key (maKhoa) references khoa(maKhoa)
 ); 
+INSERT INTO lop VALUES ('DH24TH2', 'Công nghệ thông tin - 02', 'CNTT'),
+						('DH24PM1', 'Kỹ thuật phần mền - 01', 'CNTT'),
+                        ('DH24PM2', 'Kỹ thuật phần mền - 02', 'CNTT'),
+						('DH24MK1','Marketing - 01','KT'),
+						('DH24MK2', 'Marketing - 02', 'KT'),
+                        ('DH24BT1','Bảo vệ thực vật - 01','NN'),
+                        ('DH24BT2', 'Bảo vệ thực vật - 02', 'NN'),
+                        ('DH24AV1','Sử phạm tiếng anh - 01','SP'),
+                        ('DH24AV2', 'Sử phạm tiếng anh - 02', 'SP'),
+                        ('DH24TY', 'Thú y ', 'NN'),
+                        ('DH24KT', 'Kế toán ', 'KT'),
+                        ('DH24GT', 'Giáo dục tiểu học', 'SP');
 
 -- bảng sinh viên 
 create table sinhvien (
@@ -29,14 +44,30 @@ create table sinhvien (
     maLop char(10),
     foreign key (maLop) references lop(maLop)
 );
+INSERT INTO sinhvien VALUES ('DTH235677', 'Trần Duy Khánh', '2005-09-10', 'Nam', 'An Giang', 'DH24TH2'),
+							('DTH237612', 'Bùi Thành Nhơn', '2005-06-06', 'Nam', 'An Giang', 'DH24PM2'),
+							('DPM236537', 'Trần Hoài Phương', '2005-05-16', 'Nam', 'TP.Hồ Chí Minh', 'DH24PM1'),
+                            ('DMK237859', 'Nguyễn Trọng Nghĩa', '2005-11-6', 'Nam', 'Hà Nội', 'DH24MK1'),
+                            ('DMK236120', 'Nguyễn Minh Trường', '2005-09-08', 'Nam', 'Vĩnh Long ', 'DH24MK2'),
+                            ('DAV235696', 'Nguyễn Hữu Chương', '2005-01-01', 'Nam', 'An Giang', 'DH24AV2'),
+                            ('DAV237847', 'Nguyễn Trí Tài', '2005-01-28', 'Nam', 'An Giang', 'DH24AV1'),
+                            ('DKT239858', 'Nguyễn Bảo Minh', '2005-12-25', 'Nam', 'Kiên Giang', 'DH24KT'),
+							('DBT233295', 'Đỗ Thanh Vy', '2005-06-08', 'Nữ', 'Đồng Tháp', 'DH24BT1'),
+                            ('DTY239270', 'Diệp Yến Vy', '2005-01-28', 'Nữ', 'TP.Hồ Chí Minh', 'DH24TY'),
+                            ('DGT237096', 'Nguyễn Hoàng Nam', '2005-01-12', 'Nam', 'Lạng Sơn', 'DH24GT');
+                            
 
 -- bảng giảng viên
 CREATE TABLE giangvien (
-    maGV CHAR(10) PRIMARY KEY,
+    maGV VARCHAR(10) PRIMARY KEY,
     hoTen VARCHAR(100) NOT NULL,
-    maKhoa CHAR(10),
+    maKhoa VARCHAR(10),
+    matKhau VARCHAR(50) NOT NULL,
     FOREIGN KEY (maKhoa) REFERENCES khoa(maKhoa)
 );
+INSERT INTO giangvien VALUES ('GV001', 'Trần Duy Khánh', 'CNTT', '091025'),
+							 ('GV002', 'Đỗ Thị Vy', 'NN', '080603'),
+							 ('GV003', 'Bùi Thành Nhơn', 'KT', '123456');
 
 -- bảng môn học
 CREATE TABLE monhoc (
@@ -46,6 +77,19 @@ CREATE TABLE monhoc (
     maGV CHAR(10),
     FOREIGN KEY (maGV) REFERENCES giangvien(maGV)
 );
+INSERT INTO monhoc VALUES ('MH01', 'Cơ sở dữ liệu', 3, 'GV001'),
+						  ('MH02', 'Tuyến trùng', 4, 'GV002'),
+                          ('MH03', 'Toán c', 2, 'GV002'),
+                          ('MH04', 'Kinh tế chính trị', 3, 'GV003'),
+                          ('MH05', 'Kỹ năng giảng dạy', 4, 'GV003'),
+                          ('MH06', 'Kiến trúc máy tính', 3, 'GV001'),
+                          ('MH07', 'Lý thuyết đò thị', 3, 'GV001'),
+                          ('MH08', 'Cây ăn quả', 4, 'GV002'),
+                          ('MH09', 'Ngữ pháp', 2, 'GV003'),
+                          ('MH10', 'Xác xuất thông kê', 3, 'GV001'),
+                          ('MH11', 'Lập trình cân bảng ', 4, 'GV001'),
+						  ('MH12', 'Sinh học đại cương ', 4, 'GV002'),
+                          ('MH13', 'Tài chính ngân hàng ', 3, 'GV003');
 
 -- bảng điểm
 CREATE TABLE diem (
@@ -58,64 +102,6 @@ CREATE TABLE diem (
     FOREIGN KEY (maSV) REFERENCES sinhvien(maSV),
     FOREIGN KEY (maMH) REFERENCES monhoc(maMH)
 );
-
--- thêm dữ liệu
-INSERT INTO khoa VALUES ('CNTT', 'Công nghệ thông tin'),
-						('KT', 'Kinh tế'),
-                        ('NN','Nông Nghiệp'),
-                        ('SP','Sư Phạm');
-                        
-INSERT INTO lop VALUES ('DH24TH2', 'Công nghệ thông tin - 02', 'CNTT'),
-						('DH24PM1', 'Kỹ thuật phần mền', 'CNTT'),
-                        ('DH24BT2', 'Bảo vệ thực vật - 02', 'NN'),
-                        ('DH24AV2', 'Sử phạm tiếng anh - 02', 'SP'),
-                        ('DH24MK2', 'Marketing - 02', 'KT'),
-                        ('DH24PM2', 'Kỹ thuật phần mền ', 'CNTT'),
-                        ('DH24TY', 'Thú y ', 'NN'),
-                        ('DH24KT', 'Kế toán ', 'KT'),
-                        ('DH24GT', 'Giáo dục tiểu học', 'SP'),
-						('DH24MK1','Marketing - 01','KT'),
-                        ('DH24BT1','Bảo vệ thực vật - 02','NN'),
-                        ('DH24AV1','Sử phạm tiếng anh - 01','SP');
-                        
-INSERT INTO sinhvien VALUES ('DTH235677', 'Trần Duy Khánh', '2005-09-10', 'Nam', 'An Giang', 'DH24TH2'),
-							('DPM236537', 'Trần Hoài Phương', '2005-05-16', 'Nam', 'TP.Hồ Chí Minh', 'DH24PM1'),
-                            ('DMK237859', 'Nguyễn Trọng Nghĩa', '2005-11-6', 'Nam', 'Hà Nội', 'DH24MK1'),
-                            ('DBT233295', 'Đỗ Thanh Vy', '2005-06-08', 'Nữ', 'Đồng Tháp', 'DH24BT1'),
-                            ('DTH237612', 'Bùi Thành Nhơn', '2005-06-06', 'Nam', 'An Giang', 'DH24PM2'),
-                            ('DKT239858', 'Nguyễn Bảo Minh', '2005-12-25', 'Nam', 'Kiên Giang', 'DH24KT'),
-                            ('DMK236120', 'Nguyễn Minh Trường', '2005-09-08', 'Nam', 'Vĩnh Long ', 'DH24MK2'),
-                            ('DTY239270', 'Diệp Yến Vy', '2005-01-28', 'Nữ', 'TP.Hồ Chí Minh', 'DH24TY'),
-                            ('DGT237096', 'Nguyễn Hoàng Nam', '2005-01-12', 'Nam', 'Lạng Sơn', 'DH24GT'),
-                            ('DAV235696', 'Nguyễn Hữu Chương', '2005-01-01', 'Nam', 'An Giang', 'DH24AV2'),
-                            ('DAV237847', 'Nguyễn Trí Tài', '2005-01-28', 'Nam', 'An Giang', 'DH24AV1');
-                            
-INSERT INTO giangvien VALUES ('GV01', 'Trần Thị Ngọc', 'NN'),
-							('GV02', 'Trần Thanh Huy', 'CNTT'),
-                            ('GV03', 'Đặng Hữu Cảnh', 'SP'),
-                            ('GV04','Trần Văn Tiến','CNTT'),
-                            ('GV05','Nguyễn Minh Khang','NN'),
-                            ('GV06','Trần Thị Lan Anh','KT'),
-                            ('GV07','Phạm Đức Huy','SP'),
-                            ('GV08','Lê Ngọc Bích','KT'),
-                            ('GV09','Đỗ Tuấn Kiệt','NN'),
-                            ('GV10','Nguyễn Văn Tuyên','KT'),
-                            ('GV11','Bùi Anh Tú','CNTT');
-						
-INSERT INTO monhoc VALUES ('MH01', 'Cơ sở dữ liệu', 3, 'GV02'),
-						  ('MH02', 'Tuyến trùng', 4, 'GV01'),
-                          ('MH03', 'Toán c', 2, 'GV06'),
-                          ('MH04', 'Kinh tế chính trị', 3, 'GV08'),
-                          ('MH05', 'Kỹ năng giảng dạy', 4, 'GV03'),
-                          ('MH06', 'Kiến trúc máy tính', 3, 'GV11'),
-                          ('MH07', 'Lý thuyết đò thị', 3, 'GV04'),
-                          ('MH08', 'Cây ăn quả', 4, 'GV09'),
-                          ('MH09', 'Ngữ pháp', 2, 'GV07'),
-                          ('MH10', 'Xác xuất thông kê', 3, 'GV08'),
-                          ('MH11', 'Lập trình cân bảng ', 4, 'GV11'),
-						  ('MH12', 'Sinh học đại cương ', 4, 'GV05'),
-                          ('MH13', 'Tài chính ngân hàng ', 3, 'GV10');
-                          
 INSERT INTO diem (maSV, maMH, diemQT, diemThi) VALUES 
 							('DTH235677', 'MH01', 8.0, 9.0),
                             ('DTH235677', 'MH06', 8.0, 7.0),
@@ -199,6 +185,16 @@ SELECT
 FROM diem d
 JOIN sinhvien sv ON d.maSV = sv.maSV
 JOIN monhoc mh ON d.maMH = mh.maMH;
+
+-- Xóa bảng 
+USE ql_diemsinhvien;
+
+DROP TABLE IF EXISTS diem;
+DROP TABLE IF EXISTS sinhvien;
+DROP TABLE IF EXISTS monhoc;
+DROP TABLE IF EXISTS giangvien;
+DROP TABLE IF EXISTS lop;
+DROP TABLE IF EXISTS khoa;
 
 
 

@@ -1,8 +1,7 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 import mysql.connector
 import xlsxwriter
-from tkinter import filedialog
 
 # ===== HÀM KẾT NỐI MYSQL =====
 def connect_db():
@@ -10,9 +9,17 @@ def connect_db():
         host="localhost",
         user="root",
         password="Khanh@091025",  
-        database="ql_diemsinhvien"
-        #hàm này để mở kết nối đến database ql_diemsinhvien.
+        database="quanly_diemsinhvien"
     )
+
+
+# ===== HÀM MỞ GIAO DIỆN CHÍNH =====
+def open_main_form(username):
+    root = tk.Tk()
+    root.title(f"Quản lý điểm sinh viên - Giảng viên: {username}")
+    root.geometry("700x500")
+    root.config(bg="#f7f7f7")
+    root.resizable(False, False)
 
 # ====== TẠO CỬA SỔ CHÍNH ======
 root = tk.Tk()
@@ -58,6 +65,7 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
         bg="#fff"
     )
     title_label.pack(pady=(20, 5))
+    
     
     if t == "diem": #Quản lý trang điểm
         form = tk.Frame(frames[t], bg="#fff") #Form nhập dữ liệu
@@ -352,3 +360,4 @@ show_frame("diem") #hiển thị trang mặc định.
 root.update() #cập nhật giao diện trước khi lấy kích thước.
 root.minsize(root.winfo_width(), root.winfo_height()) #đặt kích thước tối thiểu ứng dụng bằng kích thước hiện tại, tránh bị thu nhỏ quá.
 root.mainloop() #bắt đầu vòng lặp sự kiện Tkinter — GUI phản hồi người dùng cho đến khi đóng.
+
