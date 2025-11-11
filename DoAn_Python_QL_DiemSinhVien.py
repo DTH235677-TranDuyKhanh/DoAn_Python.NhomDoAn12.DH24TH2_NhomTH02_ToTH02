@@ -1,49 +1,55 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
-import mysql.connector
-import xlsxwriter
+from tkinter import ttk, messagebox, filedialog # ttk dùng cho widget hiện đại, filedialog để chọn file
+import mysql.connector # thư viện kết nối MySQL
+import xlsxwriter # dùng để xuất dữ liệu ra file Excel
 
 # ===== HÀM KẾT NỐI MYSQL =====
 def connect_db():
+    # Trả về một đối tượng kết nối tới MySQL dùng mysql.connector
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="Khanh@091025",  
-        database="quanly_diemsinhvien"
+        host="localhost",         # địa chỉ máy chủ MySQL
+        user="root",              # tên người dùng MySQL
+        password="Khanh@091025",  # mật khẩu MySQL (hãy cẩn thận khi lưu mật khẩu trong mã)
+        database="quanly_diemsinhvien"  # tên database sẽ sử dụng
     )
 
 
 # ===== HÀM MỞ GIAO DIỆN CHÍNH =====
 def open_main_form(username):
+    # Tạo cửa sổ chính sau khi đăng nhập thành công
     root = tk.Tk()
-    root.title(f"Quản lý điểm sinh viên - Giảng viên: {username}")
-    root.geometry("700x500")
-    root.config(bg="#f7f7f7")
-    root.resizable(False, False)
-
+    root.title(f"Quản lý điểm sinh viên - Giảng viên: {username}") # Tiêu đề hiển thị tên giảng viên
+    root.geometry("700x500") # Kích thước cửa sổ
+    root.config(bg="#f7f7f7") # Màu nền
+    root.resizable(False, False) # Không cho phép thay đổi kích thước
+    
 # ====== TẠO CỬA SỔ CHÍNH ======
-root = tk.Tk()
-root.title("Quản lý điểm sinh viên")
-root.geometry("700x500")
-root.config(bg="#f7f7f7")
-root.resizable(False, False)
+root = tk.Tk() # Tạo cửa sổ chính Tkinter
+root.title("Quản lý điểm sinh viên") # Tiêu đề cửa sổ
+root.geometry("700x500") # Kích thước mặc định
+root.config(bg="#f7f7f7") # Màu nền
+root.resizable(False, False) # Không cho thay đổi kích thước
 
 # ===== CĂN GIỮA MÀN HÌNH =====
 window_width = 700
 window_height = 500
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-x = (screen_width // 2) - (window_width // 2)
-y = (screen_height // 2) - (window_height // 2)
-root.geometry(f"{window_width}x{window_height}+{x}+{y}")  # đặt vị trí giữa màn hình
+screen_width = root.winfo_screenwidth() # Lấy độ rộng màn hình
+screen_height = root.winfo_screenheight() # Lấy chiều cao màn hình
+x = (screen_width // 2) - (window_width // 2) # Tính vị trí X giữa màn hình
+y = (screen_height // 2) - (window_height // 2) # Tính vị trí Y giữa màn hình
+root.geometry(f"{window_width}x{window_height}+{x}+{y}") # Đặt cửa sổ giữa màn hình
 root.config(bg="#f7f7f7")
 root.resizable(False, False)
 
 # ===== MENU =====
-menu = tk.Menu(root) #Tạo menu để thêm submenu cho chuyển trang.
+menu = tk.Menu(root) # Tạo menu chính
 root.config(menu=menu)
-frames = {} #frames dict lưu Frame cho mỗi bảng.
-tables = ["diem", "sinhvien", "lop", "khoa", "giangvien", "monhoc"] #tables danh sách tên dùng để tạo frames theo vòng lặp.
+frames = {} # Lưu tất cả các Frame tương ứng với từng trang
+
+
+# Danh sách các bảng cần quản lý
+tables = ["diem", "sinhvien", "lop", "khoa", "giangvien", "monhoc"]
+# Tên tiêu đề tương ứng từng bảng
 titles = {
     "diem": "QUẢN LÝ ĐIỂM SINH VIÊN",
     "sinhvien": "DANH SÁCH SINH VIÊN",
@@ -54,9 +60,10 @@ titles = {
 }
 
 # ===== FONT CHUNG =====
-title_font = ("Arial", 18, "bold")
-for t in tables: #Vòng lặp tạo frame cho từng bảng
-    frames[t] = tk.Frame(root, bg="#fff")
+title_font = ("Arial", 18, "bold")  # Font tiêu đề chung
+# ===== TẠO FRAME CHO TỪNG BẢNG =====
+for t in tables: 
+    frames[t] = tk.Frame(root, bg="#fff")   # Tạo frame cho từng bảng
     title_label = tk.Label( #Tiêu đề
         frames[t],
         text=titles[t],
@@ -64,7 +71,7 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
         fg="#333",
         bg="#fff"
     )
-    title_label.pack(pady=(20, 5))
+    title_label.pack(pady=(20, 5))  # Thêm tiêu đề
     
     
     if t == "diem": #Quản lý trang điểm
@@ -285,7 +292,7 @@ for t in tables: #Vòng lặp tạo frame cho từng bảng
 # ===== HÀM CHUYỂN FRAME =====
 def show_frame(name):
     for f in frames.values():
-        f.pack_forget()  #n frame khỏi cửa sổ — nhưng không xóa nội dung.
+        f.pack_forget()  # ẩn frame khỏi cửa sổ — nhưng không xóa nội dung.
     frames[name].pack(fill="both", expand=True) #làm frame giãn đầy vùng chứa.
     #Hàm này ẩn tất cả các frame, sau đó hiển thị frame có tên name.
 
