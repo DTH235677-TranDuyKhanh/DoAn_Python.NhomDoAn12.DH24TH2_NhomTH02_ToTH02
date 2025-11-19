@@ -12,16 +12,6 @@ def connect_db():
         password="Khanh@091025",  # mật khẩu MySQL (hãy cẩn thận khi lưu mật khẩu trong mã)
         database="quanly_diemsinhvien"  # tên database sẽ sử dụng
     )
-
-
-# ===== HÀM MỞ GIAO DIỆN CHÍNH =====
-def open_main_form(username):
-    # Tạo cửa sổ chính sau khi đăng nhập thành công
-    root = tk.Tk()
-    root.title(f"Quản lý điểm sinh viên - Giảng viên: {username}") # Tiêu đề hiển thị tên giảng viên
-    root.geometry("700x500") # Kích thước cửa sổ
-    root.config(bg="#f7f7f7") # Màu nền
-    root.resizable(False, False) # Không cho phép thay đổi kích thước
     
 # ====== TẠO CỬA SỔ CHÍNH ======
 root = tk.Tk() # Tạo cửa sổ chính Tkinter
