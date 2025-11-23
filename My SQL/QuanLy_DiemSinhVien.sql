@@ -196,6 +196,14 @@ DROP TABLE IF EXISTS giangvien;
 DROP TABLE IF EXISTS lop;
 DROP TABLE IF EXISTS khoa;
 
+-- Thêm cột cho bảng đã có rồi
+-- ALTER TABLE TenBang
+-- ADD TenCot KieuDuLieu ThuocTinh;
+
+-- Thêm dòng dữ liệu
+-- INSERT INTO TenBang (Cot1, Cot2, Cot3)
+-- VALUES (giatri1, giatri2, giatri3);
+
 
 
 
