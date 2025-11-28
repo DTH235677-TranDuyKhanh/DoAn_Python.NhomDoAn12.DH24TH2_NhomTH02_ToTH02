@@ -49,17 +49,17 @@ def check_login():
 # ===== GIAO DIỆN LOGIN =====
 root = tk.Tk()  # Tạo cửa sổ chính của ứng dụng
 root.title("Đăng nhập - Giảng viên")  # Tiêu đề cửa sổ
-root.geometry("700x500")  # Kích thước mặc định của cửa sổ
+root.geometry("700x550")  # Kích thước mặc định của cửa sổ
 root.resizable(False, False)  # Không cho thay đổi kích thước cửa sổ
 
 # ===== CĂN GIỮA MÀN HÌNH =====
 window_width = 700
-window_height = 500
+window_height = 550
 screen_width = root.winfo_screenwidth()   # Lấy kích thước màn hình
 screen_height = root.winfo_screenheight()
 # Tính toạ độ để căn giữa cửa sổ
 x = (screen_width // 2) - (window_width // 2)
-y = (screen_height // 2) - (window_height // 2)
+y = (screen_height // 2) - (window_height // 2) - 60
 # Thiết lập geometry với toạ độ x, y để cửa sổ xuất hiện ở giữa màn hình
 root.geometry(f"{window_width}x{window_height}+{x}+{y}")  
 

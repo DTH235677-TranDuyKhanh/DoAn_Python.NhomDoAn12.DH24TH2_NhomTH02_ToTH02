@@ -16,17 +16,17 @@ def connect_db():
 # ====== TẠO CỬA SỔ CHÍNH ======
 root = tk.Tk() # Tạo cửa sổ chính Tkinter
 root.title("Quản lý điểm sinh viên") # Tiêu đề cửa sổ
-root.geometry("700x500") # Kích thước mặc định
+root.geometry("700x550") # Kích thước mặc định
 root.config(bg="#f7f7f7") # Màu nền
 root.resizable(False, False) # Không cho thay đổi kích thước
 
 # ===== CĂN GIỮA MÀN HÌNH =====
 window_width = 700
-window_height = 500
+window_height = 550
 screen_width = root.winfo_screenwidth() # Lấy độ rộng màn hình
 screen_height = root.winfo_screenheight() # Lấy chiều cao màn hình
 x = (screen_width // 2) - (window_width // 2) # Tính vị trí X giữa màn hình
-y = (screen_height // 2) - (window_height // 2) # Tính vị trí Y giữa màn hình
+y = (screen_height // 2) - (window_height // 2) - 60  # đẩy lên trên 60 px
 root.geometry(f"{window_width}x{window_height}+{x}+{y}") # Đặt cửa sổ giữa màn hình
 root.config(bg="#f7f7f7")
 root.resizable(False, False)
@@ -71,6 +71,12 @@ for t in tables:
         tk.Label(form, text="Mã số sinh viên:", bg="#fff").grid(row=0, column=0, padx=10, pady=5,sticky="w") #Sử dụng grid để điều chỉnh vị trí label + entry theo hàng/cột.
         maSV_entry = tk.Entry(form, width=20)
         maSV_entry.grid(row=0, column=1, padx=5, pady=5,sticky="w")
+        # Combobox chọn xếp loại
+        tk.Label(form, text="Xếp loại:", bg="#fff").grid(row=2, column=0, padx=10, pady=5, sticky="w")
+
+        xepLoai_entry = ttk.Combobox(form, values=["Giỏi", "Khá", "Trung bình", "Yếu"], width=20, state="readonly")
+        xepLoai_entry.grid(row=2, column=1, padx=5, pady=5, sticky="w")
+
         # Combobox nã môn học
         tk.Label(form, text="Mã môn học:", bg="#fff").grid(row=0, column=2, padx=10, pady=5, sticky="w")
         # --- Kết nối CSDL và lấy danh sách mã môn học ---
@@ -85,11 +91,11 @@ for t in tables:
         # Text điểm quá trình
         tk.Label(form, text="Điểm quá trình:", bg="#fff").grid(row=1, column=0, padx=10, pady=5,sticky="w")
         diemQT_entry = tk.Entry(form, width=20)
-        diemQT_entry.grid(row=1, column=1, padx=5, pady=5)
+        diemQT_entry.grid(row=1, column=1, padx=5, pady=5, sticky="w")
         # Text điểm thi
         tk.Label(form, text="Điểm thi:", bg="#fff").grid(row=1, column=2, padx=10, pady=5,sticky="w")
         diemThi_entry = tk.Entry(form, width=20)
-        diemThi_entry.grid(row=1, column=3, padx=5, pady=5)
+        diemThi_entry.grid(row=1, column=3, padx=5, pady=5, sticky="w")
     # --- HÀM TÌM KIẾM THEO MÃ SINH VIÊN ---
         def tim_kiem_diem():
             try:
@@ -129,12 +135,62 @@ for t in tables:
 
             except Exception as e:
                 messagebox.showerror("Lỗi", str(e))
+        #Tìm kiếm theo xếp loại 
+        def tim_kiem_xeploai():
+            try:
+                loai = xepLoai_entry.get().strip()
+                if not loai:
+                    messagebox.showwarning("Cảnh báo", "Vui lòng chọn xếp loại!")
+                    return
+
+                conn = connect_db()
+                cur = conn.cursor()
+                
+                query = """
+                    SELECT sv.maSV, sv.hoTen, AVG(d.diemTong) AS diemTB,
+                    CASE
+                        WHEN AVG(d.diemTong) >= 8 THEN 'Giỏi'
+                        WHEN AVG(d.diemTong) >= 6.5 THEN 'Khá'
+                        WHEN AVG(d.diemTong) >= 5 THEN 'Trung bình'
+                        ELSE 'Yếu'
+                    END AS xepLoai
+                    FROM diem d
+                    JOIN sinhvien sv ON d.maSV = sv.maSV
+                    GROUP BY sv.maSV, sv.hoTen
+                    HAVING xepLoai = %s
+                """
+                
+                cur.execute(query, (loai,))
+                rows = cur.fetchall()
+                conn.close()
+
+                # Xóa dữ liệu cũ
+                for item in tree_diem.get_children():
+                    tree_diem.delete(item)
+
+                # Cấu hình cột
+                tree_diem["columns"] = ["Mã SV", "Họ Tên", "Điểm TB", "Xếp loại"]
+                for col in ["Mã SV", "Họ Tên", "Điểm TB", "Xếp loại"]:
+                    tree_diem.heading(col, text=col)
+                    tree_diem.column(col, width=150, anchor="center")
+
+                # Thêm dữ liệu vào bảng
+                for row in rows:
+                    tree_diem.insert("", "end", values=(row[0], row[1], round(row[2], 2), row[3]))
+
+                if not rows:
+                    messagebox.showinfo("Kết quả", f"Không có sinh viên thuộc loại: {loai}")
+
+            except Exception as e:
+                messagebox.showerror("Lỗi", str(e))
+        
         # ====== HÀM RESET ======
         def reset_fields():
             maSV_entry.delete(0, tk.END)
             maMH_entry.set("")  # Xóa chọn combobox (đưa về trống)
             diemQT_entry.delete(0, tk.END)
             diemThi_entry.delete(0, tk.END)
+            xepLoai_entry.set("") 
             
         # --- NÚT CHỨC NĂNG ---
         btn_frame = tk.Frame(frames[t], bg="#fff")
@@ -149,6 +205,7 @@ for t in tables:
         ttk.Button(btn_frame2, text="Lưu điểm", width=18, command=lambda: luu_excel()).pack(side="left", padx=10, pady=5)
         ttk.Button(btn_frame2, text="Reset", width=18, command=reset_fields).pack(side="left", padx=10, pady=5)  
         ttk.Button(btn_frame2, text="Tìm kiếm", width=18, command=tim_kiem_diem).pack(side="left", padx=10, pady=5)
+        ttk.Button(btn_frame2, text="Tìm theo xếp loại", width=18, command=tim_kiem_xeploai).pack(side="left", padx=10)
         ttk.Button(btn_frame2, text="Thoát", width=18, style="Accent.TButton", command=root.destroy).pack(side="left", padx=10 ,pady=5)#Sử dụng grid cho hàng 1, dùng pack(side="left") cho hàng 2 để căn giữa.
 
         # --- BẢNG DỮ LIỆU ---
